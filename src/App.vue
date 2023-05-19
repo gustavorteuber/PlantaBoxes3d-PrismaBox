@@ -3,9 +3,35 @@
 </template>
 
 <script>
+import * as THREE from "three";
+import DragControls from 'drag-controls'
+DragControls.install({THREE: THREE})
+
 export default {
+  
   mounted() {
-    this.scene = new THREE.Scene();
+    this.scene = new THREE.Scene();    
+    this.scene.background = new THREE.Color(0xf0f0f0);
+
+    var objects = [];
+
+    const geometry = new THREE.BoxGeometry(10, 1.0, 1.0);
+    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.x = 1;
+    mesh.position.y = 3;
+    mesh.position.z = 1;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    this.scene.add(mesh);
+    objects.push(mesh);
+    
+    //LIGHT
+      const skyColor = 0xB1E1FF;  // light blue
+      const groundColor = 0xB97A20;  // brownish orange
+      const intensity = 1.2;
+      const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
+      this.scene.add(light);
 
     this.camera = new THREE.PerspectiveCamera(
       75,
@@ -29,7 +55,27 @@ export default {
     this.addMouseWheelListener();
 
     this.animate();
+    
+    //Controles
+    var controls = new DragControls(objects, this.camera, this.renderer.domElement);
+
+    // Variável para controlar se a tecla Shift está pressionada
+    this.isShiftPressed = false;
+
+    // Evento de pressionar e soltar a tecla Shift
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Shift') {
+        this.isShiftPressed = true;
+      }
+    });
+    document.addEventListener('keyup', (event) => {
+      if (event.key === 'Shift') {
+        this.isShiftPressed = false;
+      }
+    });
+  
   },
+  
   methods: {
     createAxes() {
       const axesHelper = new THREE.AxesHelper(5);
@@ -68,8 +114,13 @@ export default {
       if (this.isMouseDown) {
         this.mouse.set(event.clientX, event.clientY);
         const delta = this.mouse.clone().sub(this.previousMouse);
-        this.scene.rotation.x += delta.y * 0.01;
-        this.scene.rotation.y += delta.x * 0.01;
+        if (this.isShiftPressed) {
+          // Mover a câmera
+          this.scene.rotation.x += delta.y * 0.01;
+          this.scene.rotation.y += delta.x * 0.01;
+        } else {
+          
+        }
         this.previousMouse.set(event.clientX, event.clientY);
       }
     },

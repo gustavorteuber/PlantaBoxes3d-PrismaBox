@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "drag-controls": "^1.0.4",
+    "three": "^0.152.2",
     "three-orbitcontrols": "^2.110.3",
     "vue": "^3.2.47"
   },
